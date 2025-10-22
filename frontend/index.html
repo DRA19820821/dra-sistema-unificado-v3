@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Unificado - Guias e Mapas Mentais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        .mode-card { transition: all 0.3s; cursor: pointer; }
+        .mode-card.selected { 
+            border-color: #4F46E5; 
+            background: #EEF2FF;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .tab-button.active { 
+            background: #4F46E5; 
+            color: white; 
+        }
+        .log-entry { animation: slideIn 0.3s; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen" x-data="appData()" x-init="init()">
+    
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-brain text-indigo-600"></i>
+                        Sistema Unificado
+                    </h1>
+                    <p class="text-gray-600">Guias Educacionais + Mapas Mentais</p>
+                </div>
+                <div class="text-right">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Conectado
+                    </span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Tabs de Modo -->
+        <div class="bg-white rounded-lg shadow p-2 mb-6 flex gap-2">
+            <button 
+                @click="tab = 'full'"
+                :class="{'active': tab === 'full'}"
+                class="tab-button flex-1 py-3 rounded-lg font-medium transition"
+            >
+                <i class="fas fa-rocket mr-2"></i>
+                Pipeline Completo
+            </button>
+            <button 
+                @click="tab = 'guias'"
+                :class="{'active': tab === 'guias'}"
+                class="tab-button flex-1 py-3 rounded-lg font-medium transition"
+            >
+                <i class="fas fa-book mr-2"></i>
+                Só Guias
+            </button>
+            <button 
+                @click="tab = 'mapas'"
+                :class="{'active': tab === 'mapas'}"
+                class="tab-button flex-1 py-3 rounded-lg font-medium transition"
+            >
+                <i class="fas fa-map mr-2"></i>
+                Só Mapas
+            </button>
+        </div>
+        
+        <!-- Main Card -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            
+            <!-- PIPELINE COMPLETO -->
+            <div x-show="tab === 'full'" x-cloak>
+                <h2 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-rocket text-indigo-600 mr-2"></i>
+                    Pipeline Completo
+                </h2>
+                <p class="text-gray-600 mb-6">
+                    Gera os guias HTML e automaticamente cria os mapas mentais .mmd
+                </p>
+                
+                <!-- Upload Config YAML -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Arquivo de Configuração (YAML)
+                    </label>
+                    <input 
+                        type="file" 
+                        accept=".yaml,.yml"
+                        @change="handleConfigUpload"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    >
+                    <p class="mt-1 text-xs text-gray-500">
+                        Arquivo YAML com configuração do projeto, tópicos e modelos
+                    </p>
+                </div>
+                
+                <!-- Modo de Processamento -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Modo de Processamento
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div 
+                            @click="config.modo = 'sequencial'"
+                            :class="{'selected': config.modo === 'sequencial'}"
+                            class="mode-card border-2 rounded-lg p-4"
+                        >
+                            <h3 class="font-semibold mb-1">Sequencial</h3>
+                            <p class="text-sm text-gray-600">Mais estável, processamento tradicional</p>
+                        </div>
+                        <div 
+                            @click="config.modo = 'paralelo'"
+                            :class="{'selected': config.modo === 'paralelo'}"
+                            class="mode-card border-2 rounded-lg p-4"
+                        >
+                            <h3 class="font-semibold mb-1">
+                                Paralelo <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">2-5x RÁPIDO</span>
+                            </h3>
+                            <p class="text-sm text-gray-600">Processa múltiplas partes simultaneamente</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botão Processar -->
+                <button 
+                    @click="startFullPipeline"
+                    :disabled="!configFile || processing"
+                    class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-300 transition"
+                >
+                    <i :class="processing ? 'fas fa-spinner fa-spin' : 'fas fa-rocket'" class="mr-2"></i>
+                    <span x-text="processing ? 'Processando...' : 'Iniciar Pipeline Completo'"></span>
+                </button>
+            </div>
+            
+            <!-- SÓ GUIAS -->
+            <div x-show="tab === 'guias'" x-cloak>
+                <h2 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-book text-blue-600 mr-2"></i>
+                    Geração de Guias
+                </h2>
+                <p class="text-gray-600 mb-6">
+                    Gera apenas os arquivos HTML dos guias educacionais
+                </p>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Arquivo de Configuração (YAML)
+                    </label>
+                    <input 
+                        type="file" 
+                        accept=".yaml,.yml"
+                        @change="handleConfigUpload"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    >
+                </div>
+                
+                <button 
+                    @click="startGuiasOnly"
+                    :disabled="!configFile || processing"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 transition"
+                >
+                    <i :class="processing ? 'fas fa-spinner fa-spin' : 'fas fa-book'" class="mr-2"></i>
+                    <span x-text="processing ? 'Gerando...' : 'Gerar Guias'"></span>
+                </button>
+            </div>
+            
+            <!-- SÓ MAPAS -->
+            <div x-show="tab === 'mapas'" x-cloak>
+                <h2 class="text-2xl font-bold mb-4">
+                    <i class="fas fa-map text-green-600 mr-2"></i>
+                    Geração de Mapas Mentais
+                </h2>
+                <p class="text-gray-600 mb-6">
+                    Gera mapas .mmd a partir de guias HTML existentes
+                </p>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Arquivos HTML
+                    </label>
+                    <input 
+                        type="file" 
+                        multiple
+                        accept=".html"
+                        @change="handleHtmlUpload"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                    >
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Configuração dos Modelos (YAML)
+                    </label>
+                    <input 
+                        type="file" 
+                        accept=".yaml,.yml"
+                        @change="handleConfigUpload"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                    >
+                </div>
+                
+                <button 
+                    @click="startMapasOnly"
+                    :disabled="!htmlFiles.length || !configFile || processing"
+                    class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-300 transition"
+                >
+                    <i :class="processing ? 'fas fa-spinner fa-spin' : 'fas fa-map'" class="mr-2"></i>
+                    <span x-text="processing ? 'Gerando...' : 'Gerar Mapas'"></span>
+                </button>
+            </div>
+            
+        </div>
+        
+        <!-- Progress -->
+        <div x-show="processing || completed" class="bg-white rounded-lg shadow-lg p-6 mb-6" x-cloak>
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fas fa-spinner fa-spin mr-2" x-show="processing"></i>
+                <i class="fas fa-check-circle text-green-500 mr-2" x-show="completed"></i>
+                Progresso
+            </h2>
+            
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+                <div 
+                    class="bg-indigo-600 h-4 rounded-full transition-all duration-500"
+                    :style="`width: ${progress.percentage}%`"
+                ></div>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-1" x-text="`Etapa: ${progress.stage}`"></p>
+            <p class="font-medium" x-text="progress.message"></p>
+        </div>
+        
+        <!-- Logs -->
+        <div x-show="logs.length > 0" class="bg-gray-900 rounded-lg shadow-lg p-6" x-cloak>
+            <h2 class="text-xl font-semibold mb-4 text-white">
+                <i class="fas fa-terminal mr-2"></i>Console
+            </h2>
+            
+            <div class="bg-black rounded p-4 h-64 overflow-y-auto font-mono text-sm">
+                <template x-for="log in logs" :key="log.timestamp">
+                    <div class="log-entry mb-1" :class="{
+                        'text-green-400': log.level === 'success',
+                        'text-blue-400': log.level === 'info',
+                        'text-yellow-400': log.level === 'warning',
+                        'text-red-400': log.level === 'error'
+                    }">
+                        <span class="text-gray-500" x-text="log.timestamp"></span>
+                        <span class="ml-2" x-text="log.message"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        function appData() {
+            return {
+                tab: 'full',
+                config: { modo: 'paralelo' },
+                configFile: null,
+                htmlFiles: [],
+                processing: false,
+                completed: false,
+                progress: { percentage: 0, stage: '', message: '' },
+                logs: [],
+                ws: null,
+                
+                init() {
+                    this.connectWebSocket();
+                },
+                
+                connectWebSocket() {
+                    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    this.ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+                    
+                    this.ws.onopen = () => this.addLog('info', '🔌 Conectado');
+                    this.ws.onmessage = (e) => this.handleMessage(JSON.parse(e.data));
+                    this.ws.onerror = () => this.addLog('error', '❌ Erro de conexão');
+                    this.ws.onclose = () => setTimeout(() => this.connectWebSocket(), 3000);
+                },
+                
+                handleMessage(data) {
+                    if (data.type === 'progress') {
+                        this.progress = data;
+                    } else if (data.type === 'log') {
+                        this.addLog(data.level, data.message);
+                    } else if (data.type === 'completion') {
+                        this.completed = true;
+                        this.processing = false;
+                    }
+                },
+                
+                addLog(level, message) {
+                    this.logs.push({
+                        timestamp: new Date().toLocaleTimeString(),
+                        level: level,
+                        message: message
+                    });
+                },
+                
+                handleConfigUpload(e) {
+                    this.configFile = e.target.files[0];
+                },
+                
+                handleHtmlUpload(e) {
+                    this.htmlFiles = Array.from(e.target.files);
+                },
+                
+                async startFullPipeline() {
+                    this.processing = true;
+                    this.logs = [];
+                    
+                    const formData = new FormData();
+                    formData.append('config_file', this.configFile);
+                    formData.append('modo', this.config.modo);
+                    
+                    try {
+                        const res = await fetch('/api/process-full', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!res.ok) throw new Error((await res.json()).detail);
+                        
+                    } catch (error) {
+                        alert('Erro: ' + error.message);
+                        this.processing = false;
+                    }
+                },
+                
+                async startGuiasOnly() {
+                    this.processing = true;
+                    this.logs = [];
+                    
+                    const formData = new FormData();
+                    formData.append('config_file', this.configFile);
+                    
+                    try {
+                        const res = await fetch('/api/process-guias-only', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!res.ok) throw new Error((await res.json()).detail);
+                        
+                    } catch (error) {
+                        alert('Erro: ' + error.message);
+                        this.processing = false;
+                    }
+                },
+                
+                async startMapasOnly() {
+                    this.processing = true;
+                    this.logs = [];
+                    
+                    const formData = new FormData();
+                    this.htmlFiles.forEach(f => formData.append('html_files', f));
+                    formData.append('config_file', this.configFile);
+                    
+                    try {
+                        const res = await fetch('/api/process-mapas-only', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!res.ok) throw new Error((await res.json()).detail);
+                        
+                    } catch (error) {
+                        alert('Erro: ' + error.message);
+                        this.processing = false;
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+</html>

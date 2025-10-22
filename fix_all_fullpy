@@ -1,0 +1,329 @@
+#!/usr/bin/env python3
+"""
+Script unificado para aplicar TODAS as correções necessárias.
+
+Uso:
+    python fix_all.py
+
+O que este script faz:
+    1. Adiciona função save_mmd_file ao file_manager.py
+    2. Corrige imports em graph_parallel.py
+    3. Corrige imports em graph.py
+    4. Corrige imports em routes_pipeline.py
+    5. Verifica requirements.txt
+
+Autor: Sistema Unificado
+"""
+
+import sys
+from pathlib import Path
+from datetime import datetime
+
+def print_header(text):
+    print("\n" + "="*70)
+    print(f"  {text}")
+    print("="*70 + "\n")
+
+
+def create_backup(filepath):
+    """Cria backup com timestamp"""
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_path = filepath.with_suffix(f'.bak_{timestamp}')
+    content = filepath.read_text(encoding='utf-8')
+    backup_path.write_text(content, encoding='utf-8')
+    print(f"   💾 Backup: {backup_path.name}")
+    return content
+
+
+def fix_file_manager():
+    """Adiciona função save_mmd_file"""
+    print("1️⃣  Corrigindo file_manager.py...")
+    
+    filepath = Path('backend/services/file_manager.py')
+    
+    if not filepath.exists():
+        print(f"   ⚠️  Arquivo não encontrado: {filepath}")
+        return False
+    
+    content = filepath.read_text(encoding='utf-8')
+    
+    # Verifica se já tem a função
+    if 'def save_mmd_file' in content:
+        print("   ℹ️  Já está correto (save_mmd_file existe)")
+        return False
+    
+    # Backup
+    create_backup(filepath)
+    
+    # Conteúdo correto
+    correct_content = '''from pathlib import Path
+from backend.core.config import get_settings
+import json
+
+settings = get_settings()
+
+def ensure_directories():
+    """Garante que diretórios existem."""
+    Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
+    Path(settings.output_guias_dir).mkdir(parents=True, exist_ok=True)
+    Path(settings.output_mapas_dir).mkdir(parents=True, exist_ok=True)
+    Path(settings.logs_dir).mkdir(parents=True, exist_ok=True)
+
+def salvar_guia_html(filename: str, content: str) -> str:
+    """Salva guia HTML."""
+    filepath = Path(settings.output_guias_dir) / filename
+    filepath.write_text(content, encoding='utf-8')
+    return str(filepath)
+
+def save_mmd_file(filename: str, content: str, metadata: dict = None) -> str:
+    """Salva mapa mental .mmd."""
+    filepath = Path(settings.output_mapas_dir) / filename
+    filepath.write_text(content, encoding='utf-8')
+    
+    # Salva metadata em arquivo .json separado (opcional)
+    if metadata:
+        meta_filepath = filepath.with_suffix('.json')
+        meta_filepath.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=False), 
+            encoding='utf-8'
+        )
+    
+    return str(filepath)
+
+def listar_guias_html() -> list[str]:
+    """Lista guias HTML gerados."""
+    path = Path(settings.output_guias_dir)
+    return [f.name for f in path.glob("*.html")]
+'''
+    
+    filepath.write_text(correct_content, encoding='utf-8')
+    print("   ✅ Função save_mmd_file adicionada")
+    return True
+
+
+def fix_graph_parallel():
+    """Corrige imports em graph_parallel.py"""
+    print("\n2️⃣  Corrigindo graph_parallel.py...")
+    
+    filepath = Path('backend/agents/mapas/graph_parallel.py')
+    
+    if not filepath.exists():
+        print(f"   ⚠️  Arquivo não encontrado: {filepath}")
+        return False
+    
+    content = filepath.read_text(encoding='utf-8')
+    original_content = content
+    
+    # Verifica se já está correto
+    if 'from backend.services.llm_factory import get_llm' in content:
+        print("   ℹ️  Já está correto")
+        return False
+    
+    # Backup
+    create_backup(filepath)
+    
+    # Correções
+    replacements = [
+        ('from ..services.llm_factory import get_llm', 
+         'from backend.services.llm_factory import get_llm'),
+        ('from ..agents.prompts.gerador_prompts import SYSTEM_PROMPT as GERADOR_SYSTEM',
+         'from .prompts.gerador_prompts import SYSTEM_PROMPT as GERADOR_SYSTEM'),
+        ('from ..agents.prompts.gerador_prompts import USER_PROMPT_TEMPLATE as GERADOR_TEMPLATE',
+         'from .prompts.gerador_prompts import USER_PROMPT_TEMPLATE as GERADOR_TEMPLATE'),
+        ('from ..agents.prompts.revisor_prompts import SYSTEM_PROMPT as REVISOR_SYSTEM',
+         'from .prompts.revisor_prompts import SYSTEM_PROMPT as REVISOR_SYSTEM'),
+        ('from ..agents.prompts.revisor_prompts import USER_PROMPT_TEMPLATE as REVISOR_TEMPLATE',
+         'from .prompts.revisor_prompts import USER_PROMPT_TEMPLATE as REVISOR_TEMPLATE'),
+        ('from ..utils.logger import logger',
+         'from backend.utils.logger import logger'),
+    ]
+    
+    for old, new in replacements:
+        content = content.replace(old, new)
+    
+    if content != original_content:
+        filepath.write_text(content, encoding='utf-8')
+        print("   ✅ Imports corrigidos")
+        return True
+    
+    return False
+
+
+def fix_graph():
+    """Corrige imports em graph.py"""
+    print("\n3️⃣  Corrigindo graph.py (mapas)...")
+    
+    filepath = Path('backend/agents/mapas/graph.py')
+    
+    if not filepath.exists():
+        print(f"   ⚠️  Arquivo não encontrado: {filepath}")
+        return False
+    
+    content = filepath.read_text(encoding='utf-8')
+    original_content = content
+    
+    # Verifica se já está correto
+    if 'from backend.utils.logger import logger' in content:
+        print("   ℹ️  Já está correto")
+        return False
+    
+    # Backup
+    create_backup(filepath)
+    
+    # Correções
+    content = content.replace(
+        'from ..utils.logger import logger',
+        'from backend.utils.logger import logger'
+    )
+    
+    if content != original_content:
+        filepath.write_text(content, encoding='utf-8')
+        print("   ✅ Imports corrigidos")
+        return True
+    
+    return False
+
+
+def fix_routes_pipeline():
+    """Corrige imports em routes_pipeline.py"""
+    print("\n4️⃣  Corrigindo routes_pipeline.py...")
+    
+    filepath = Path('backend/api/routes_pipeline.py')
+    
+    if not filepath.exists():
+        print(f"   ⚠️  Arquivo não encontrado: {filepath}")
+        return False
+    
+    content = filepath.read_text(encoding='utf-8')
+    original_content = content
+    
+    # Verifica se já está correto
+    if 'from backend.core.config import get_settings' in content:
+        print("   ℹ️  Já está correto")
+        return False
+    
+    # Backup
+    create_backup(filepath)
+    
+    # Correções
+    replacements = [
+        ('from ..core.config import get_settings',
+         'from backend.core.config import get_settings'),
+        ('from ..services.config_parser import parse_yaml_config',
+         'from backend.services.config_parser import parse_yaml_config'),
+        ('from ..agents.guias.graph import execute_graph_guias',
+         'from backend.agents.guias.graph import execute_graph_guias'),
+        ('from ..agents.mapas.graph import execute_graph',
+         'from backend.agents.mapas.graph import execute_graph'),
+        ('from ..api.websocket import manager',
+         'from backend.api.websocket import manager'),
+        ('from ..utils.logger import logger',
+         'from backend.utils.logger import logger'),
+    ]
+    
+    for old, new in replacements:
+        content = content.replace(old, new)
+    
+    if content != original_content:
+        filepath.write_text(content, encoding='utf-8')
+        print("   ✅ Imports corrigidos")
+        return True
+    
+    return False
+
+
+def check_requirements():
+    """Verifica requirements.txt"""
+    print("\n5️⃣  Verificando requirements.txt...")
+    
+    filepath = Path('requirements.txt')
+    
+    if not filepath.exists():
+        print(f"   ⚠️  Arquivo não encontrado: {filepath}")
+        return False
+    
+    content = filepath.read_text(encoding='utf-8')
+    
+    # Verifica problema conhecido
+    if '\nunicode' in content and 'unidecode' not in content:
+        print("   ⚠️  PROBLEMA ENCONTRADO:")
+        print("       Linha com 'unicode' em vez de 'unidecode'")
+        print("\n   🔧 CORREÇÃO MANUAL NECESSÁRIA:")
+        print("       1. Abra: requirements.txt")
+        print("       2. Na última linha, troque:")
+        print("          unicode")
+        print("          Por:")
+        print("          unidecode==1.3.8")
+        print("       3. Salve e execute: pip install -r requirements.txt")
+        return False
+    elif 'unidecode' in content:
+        print("   ✅ Está correto (unidecode presente)")
+        return True
+    else:
+        print("   ⚠️  Não foi possível verificar automaticamente")
+        return None
+
+
+def main():
+    print_header("FIX ALL - CORREÇÕES UNIFICADAS")
+    
+    print("🔧 Aplicando todas as correções necessárias...")
+    
+    fixed = []
+    
+    # Executa todas as correções
+    if fix_file_manager():
+        fixed.append('file_manager.py')
+    
+    if fix_graph_parallel():
+        fixed.append('graph_parallel.py')
+    
+    if fix_graph():
+        fixed.append('graph.py')
+    
+    if fix_routes_pipeline():
+        fixed.append('routes_pipeline.py')
+    
+    check_requirements()
+    
+    # Resumo
+    print_header("RESUMO")
+    
+    if fixed:
+        print(f"✅ {len(fixed)} arquivo(s) corrigido(s):")
+        for f in fixed:
+            print(f"   • {f}")
+    else:
+        print("ℹ️  Todos os arquivos já estavam corretos!")
+    
+    print("\n" + "="*70)
+    print("  PRÓXIMOS PASSOS")
+    print("="*70 + "\n")
+    
+    print("1. Se requirements.txt precisa correção:")
+    print("   - Abra o arquivo")
+    print("   - Troque 'unicode' por 'unidecode==1.3.8'")
+    print("   - Execute: pip install -r requirements.txt")
+    print()
+    print("2. Teste o sistema:")
+    print("   python run.py")
+    print()
+    print("3. Se funcionar:")
+    print("   🎉 Acesse http://localhost:8000")
+    print()
+    print("4. Se ainda houver erro:")
+    print("   📋 Copie a mensagem completa de erro")
+    print()
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Operação cancelada")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\n❌ Erro: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)

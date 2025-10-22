@@ -1,0 +1,78 @@
+# ============================================
+# CONFIGURAÇÃO DO PROJETO
+# ============================================
+projeto:
+  nome: "Direito Civil"
+  area_conhecimento: "Direito Civil"
+  radical_arquivo: "dCiv"
+  pasta_saida_guias: "./output/guias"
+  pasta_saida_mapas: "./output/mapas"
+
+# ============================================
+# TÓPICOS A PROCESSAR
+# ============================================
+topicos:
+  - "Contratos em Espécie"
+  - "Direitos Reais"
+  - "Direito de Família"
+  - "Direito das Sucessões"
+  - "Parte Geral - Negócios Jurídicos"
+  - "Responsabilidade Civil"
+  - "Prescrição e Decadência"
+  - "Parte Geral - Pessoas"
+  - "Parte Geral - Bens"
+  - "Direito de Empresa"
+
+# ============================================
+# MODELOS PARA GERAÇÃO DE GUIAS
+# ============================================
+modelos_guias:
+  gerador:
+    provedor: "gemini"
+    modelo: "gemini-2.5-pro"
+    #provedor: "anthropic"
+    #modelo: "claude-opus-4-1"
+    temperatura: 0.7
+    max_tokens: 16000
+  
+  revisor:
+    #provedor: "gemini"
+    #modelo: "gemini-2.5-pro"
+    provedor: "anthropic"
+    modelo: "claude-opus-4-1"
+    temperatura: 0.3
+    max_tokens: 4000
+
+# ============================================
+# MODELOS PARA GERAÇÃO DE MAPAS MENTAIS
+# ============================================
+modelos_mapas:
+  divisor:
+    provedor: "gemini"
+    modelo: "gemini-2.5-pro"
+    provedor: "gemini"
+    modelo: "gemini-2.5-pro"
+  
+  gerador:
+    provedor: "gemini"
+    modelo: "gemini-2.5-pro"
+  
+  revisor:
+    provedor: "gemini"
+    modelo: "gemini-2.5-pro"
+
+# ============================================
+# CONFIGURAÇÕES DE PROCESSAMENTO
+# ============================================
+processamento:
+  max_paralelo: 3
+  max_tentativas_revisao: 3
+  delay_retry: 5
+
+# ============================================
+# PROMPTS (OPCIONAL - USA OS DEFAULTS)
+# ============================================
+prompts:
+  guias:
+    gerador: "prompts/guias_gerador.txt"
+    revisor: "prompts/guias_revisor.txt"
