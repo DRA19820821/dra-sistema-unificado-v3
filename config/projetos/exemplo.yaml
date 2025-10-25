@@ -2,9 +2,9 @@
 # CONFIGURAÇÃO DO PROJETO
 # ============================================
 projeto:
-  nome: "Direito Civil"
-  area_conhecimento: "Direito Civil"
-  radical_arquivo: "dCiv"
+  nome: "Direito Penal"
+  area_conhecimento: "Direito Penal"
+  radical_arquivo: "dPen"
   pasta_saida_guias: "./output/guias"
   pasta_saida_mapas: "./output/mapas"
 
@@ -12,37 +12,9 @@ projeto:
 # TÓPICOS A PROCESSAR
 # ============================================
 topicos:
-  - "LINDB e Teoria Geral do Direito Civil: Inclui: Vigência, aplicação, integração, antinomia da lei, direito intertemporal."
-  - "Pessoas Naturais: Inclui: Personalidade, capacidade (de fato e de direito), emancipação, direitos da personalidade, ausência, comoriência."
-  - "Pessoas Jurídicas: Inclui: Classificação, constituição, extinção, domicílio, desconsideração da personalidade jurídica (direta e inversa), associações, fundações."
-  - "Bens e Domicílio: Inclui: Classificação dos bens (móveis/imóveis, fungíveis, consumíveis, divisíveis, principais/acessórios), bens públicos, bem de família. Domicílio (conceito, espécies, pluralidade)."
-  - "Fato, Ato e Negócio Jurídico: Inclui: Fatos jurídicos (lato sensu), ato jurídico (stricto sensu), negócio jurídico, elementos de existência, validade e eficácia (escada ponteana)."
-  - "Defeitos e Invalidade do Negócio Jurídico: Inclui: Erro, dolo, coação, estado de perigo, lesão, fraude contra credores, simulação. Nulidade e anulabilidade (diferenças), conversão do negócio."
-  - "Elementos Acidentais e Prova: Inclui: Condição, termo e encargo. Prova dos fatos jurídicos (meios de prova, ônus)."
-  - "Prescrição e Decadência: Inclui: Conceitos, distinção, prazos (principais), causas impeditivas, suspensivas e interruptivas, prescrição intercorrente."
-  - "Obrigações - Modalidades e Classificação: Inclui: Obrigação de dar (certa/incerta), fazer e não fazer. Alternativas, facultativas, divisíveis/indivisíveis, solidariedade (ativa e passiva)."
-  - "Transmissão e Adimplemento das Obrigações: Inclui: Cessão de crédito, assunção de dívida, cessão de posição contratual. Pagamento (quem, a quem, objeto, prova, lugar, tempo)."
-  - "Formas Especiais de Pagamento e Extinção: Inclui: Pagamento em consignação, sub-rogação, imputação em pagamento, dação em pagamento, novação, compensação, confusão, remissão de dívidas."
-  - "Inadimplemento das Obrigações: Inclui: Mora (ex re, ex persona), perdas e danos, juros (legais, contratuais, moratórios), cláusula penal (compensatória, moratória), arras (confirmatórias, penitenciais)."
-  - "Teoria Geral dos Contratos: Inclui: Princípios (boa-fé objetiva, função social, relatividade), formação (proposta, aceitação), contrato preliminar, interpretação dos contratos."
-  - "Garantias Contratuais Legais e Extinção: Inclui: Vícios redibitórios, evicção. Extinção: distrato, resilição (unilateral, bilateral), resolução (inadimplemento, onerosidade excessiva)."
-  - "Contratos em Espécie I (Propriedade): Inclui: Compra e Venda (cláusulas especiais), Doação (tipos, revogação), Troca, Contrato Estimatório."
-  - "Contratos em Espécie II (Uso e Gozo): Inclui: Locação de Coisas (CC), Locação de Imóvel Urbano (Lei 8.245/91), Empréstimo (Mútuo e Comodato)."
-  - "Contratos em Espécie III (Serviços e Gestão): Inclui: Prestação de Serviço, Empreitada, Mandato, Comissão, Corretagem, Transporte."
-  - "Contratos em Espécie IV (Garantia e Outros): Inclui: Fiança (benefício de ordem), Seguro, Transação, Jogo e Aposta."
-  - "Atos Unilaterais: Inclui: Promessa de recompensa, gestão de negócios, pagamento indevido, enriquecimento sem causa."
-  - "Responsabilidade Civil - Teoria Geral e Elementos: Inclui: Ato ilícito e abuso de direito. Elementos (conduta, nexo causal, dano). Culpa. Excludentes de ilicitude e de nexo causal."
-  - "Responsabilidade Civil - Espécies e Quantificação: Inclui: Subjetiva vs. Objetiva (Teoria do Risco). Responsabilidade pelo fato de outrem, fato do produto/serviço (link CDC), fato do animal. Dano (material, moral, estético, perda de uma chance)."
-  - "Posse: Inclui: Teorias (Ihering/Savigny), classificação (justa/injusta, boa-fé/má-fé), aquisição, perda, efeitos, proteção possessória (interditos)."
-  - "Propriedade: Inclui: Conceito, atributos (GRUD), função social, aquisição e perda, descoberta, achado de tesouro. Direitos de Vizinhança (uso anormal, árvores, passagem forçada)."
-  - "Formas de Aquisição da Propriedade: Inclui: Usucapião (todas as espécies - extraordinária, ordinária, especial urbana/rural, familiar), registro, acessão, tradição."
-  - "Condomínio: Inclui: Condomínio geral (voluntário, necessário). Condomínio Edilício (convenção, assembleia, síndico, despesas)."
-  - "Direitos Reais sobre Coisa Alheia (Fruição): Inclui: Superfície, Servidão, Usufruto, Uso, Habitação, Direito do Promitente Comprador."
-  - "Direitos Reais de Garantia: Inclui: Hipoteca, Penhor, Anticrese. Alienação Fiduciária em Garantia (Lei 9.514/97)."
-  - "Direito de Família (Relações Pessoais e Proteção): Inclui: Casamento (habilitação, impedimentos, celebração). União Estável (requisitos, efeitos). Parentesco. Filiação. Alimentos. Tutela, Curatela, Tomada de Decisão Apoiada."
-  - "Direito de Família (Relações Patrimoniais): Inclui: Regime de Bens (pacto antenupcial, espécies). Bem de família (legal, convencional). Dissolução do casamento e união estável (divórcio, partilha)."
-  - "Direito das Sucessões: Inclui: Disposições gerais (saisine), aceitação e renúncia. Sucessão Legítima (ordem de vocação). Sucessão Testamentária (testamento, legados, deserdação). Inventário e partilha."
-
+  - "Princípios Penais e Fontes: Inclui: Legalidade, insignificância, intervenção mínima, culpabilidade, humanidade, fontes."
+  - "Aplicação da Lei Penal no Tempo e Espaço: Inclui: Tempus regit actum, extratividade, territorialidade, extraterritorialidade, pena cumprida no estrangeiro."
+  - "Teoria do Crime: Fato Típico (Conduta): Inclui: Conceito analítico de crime, conduta, dolo (direto, eventual), culpa (consciente, inconsciente), omissão."
 
 # ============================================
 # MODELOS PARA GERAÇÃO DE GUIAS
