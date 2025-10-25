@@ -36,7 +36,7 @@ logs/*
 temp/
 *.backup
 *.bak
-MapasMermaid/*
-scripts/*.*
-tests/*.*
-docs/*.*
+MapasMermaid
+scripts
+tests
+docs
