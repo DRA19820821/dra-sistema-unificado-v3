@@ -18,6 +18,7 @@ config/projetos/*.yaml
 # Outputs e Uploads
 output/guias/*.html
 output/mapas/*.mmd
+output/mapas/*.json
 uploads/*
 !uploads/.gitkeep
 logs/*
